@@ -1,3 +1,4 @@
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
@@ -17,16 +18,22 @@ def cluster_data():
     try:
         if request.method == 'POST' and request.is_json:
             data = request.json  # 클라이언트에서 전송한 JSON 데이터
-            new_data = np.array([[data['평균기온(°C)'], data['일교차(°C)']]])
-
+            
+            # JSON 파일에서 학습 데이터 추출
+            with open('casual_top_cluster.json', 'r') as json_file:
+                learning_data = json.load(json_file)
+                
+            # 평균기온과 일교차 데이터 추출
+            temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
+            
             # 입력 데이터 표준화
-            new_data_scaled = scaler.transform(new_data)
+            new_data_scaled = scaler.transform(temperature_data)
 
             # 클러스터 예측
-            cluster_label = kmeans_model.predict(new_data_scaled)[0]
+            cluster_labels = kmeans_model.predict(new_data_scaled)
 
             response = {
-                'cluster': int(cluster_label)
+                'clusters': [int(label) for label in cluster_labels]
             }
 
             return jsonify(response), 200
@@ -36,29 +43,11 @@ def cluster_data():
         return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    # 스케일러 피팅
-    data_for_scaling = [
-    {
-        "일시": "2022-04-27",
-        "이미지": "//image.msscdn.net/mfile_s01/_street_images/81221/280.street_img_view1626a0b0cdefe7.jpg?20220428123509",
-        "평균기온(°C)": 17.7,
-        "일교차(°C)": 11.3,
-        "cluster": 5
-    },
-    {
-        "일시": "2022-04-28",
-        "이미지": "//image.msscdn.net/mfile_s01/_street_images/81241/280.street_img_view1626f4fdd90678.jpg?",
-        "평균기온(°C)": 18.2,
-        "일교차(°C)": 14.3,
-        "cluster": 2
-    },
-    {
-        "일시": "2022-04-28",
-        "이미지": "//image.msscdn.net/mfile_s01/_street_images/81264/280.street_img_view1626f4c109fa69.jpg?20220428100038",
-        "평균기온(°C)": 18.2,
-        "일교차(°C)": 14.3,
-        "cluster": 2
-    }
-    ]
-    scaler.fit(data_for_scaling)
+    # JSON 파일에서 학습 데이터를 추출하여 스케일러에 학습시킵니다.
+    with open('casual_top_cluster.json', 'r') as json_file:
+        learning_data = json.load(json_file)
+        
+    temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
+    scaler.fit(temperature_data)
+    
     app.run(debug=True)
