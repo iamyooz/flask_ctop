@@ -11,7 +11,11 @@ kmeans_model = joblib.load('ctop_kmeans_model.pkl')
 # 스케일러 생성
 scaler = StandardScaler()
 
-@app.route('/casual_top', methods=['POST'])
+@app.route('/', methods=['GET'])
+def home():
+    return "hi"
+
+@app.route('/casual_top2', methods=['POST'])
 def cluster_data():
     try:
         data = request.json  # 클라이언트에서 전송한 JSON 데이터
