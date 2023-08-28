@@ -21,7 +21,7 @@ def cluster_data():
             data = request.json  # 클라이언트에서 전송한 JSON 데이터
             
             # JSON 파일에서 학습 데이터 추출
-            with open('casual_top_cluster.json', 'r') as json_file:
+            with open('ctop_learning.json', 'r') as json_file:
                 learning_data = json.load(json_file)
                 
             # 평균기온과 일교차 데이터 추출
@@ -45,7 +45,7 @@ def cluster_data():
 
 if __name__ == '__main__':
     # JSON 파일에서 학습 데이터를 추출하여 스케일러에 학습시킵니다.
-    with open('casual_top_cluster.json', 'r') as json_file:
+    with open('ctop_learning.json', 'r') as json_file:
         learning_data = json.load(json_file)
         
     # 평균기온과 일교차 데이터 추출
