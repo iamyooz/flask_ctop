@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
+CORS(app)  # CORS 설정을 추가하여 CORS 관련 문제를 해결합니다.
 
 # 클러스터링 모델 로드
 kmeans_model = joblib.load('ctop_kmeans_model.pkl')
@@ -47,7 +48,10 @@ if __name__ == '__main__':
     with open('casual_top_cluster.json', 'r') as json_file:
         learning_data = json.load(json_file)
         
+    # 평균기온과 일교차 데이터 추출
     temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
+    
+    # 스케일러 학습
     scaler.fit(temperature_data)
     
     app.run(debug=True)
