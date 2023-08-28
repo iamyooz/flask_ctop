@@ -31,7 +31,7 @@ def load_scaler_and_data():
         scaler.fit(temperature_data)
 
 @app.route('/', methods=['POST'])
-def cluster_data():
+def get_cluster_images():
     global scaler, learning_data
 
     try:
@@ -48,10 +48,16 @@ def cluster_data():
             input_data_scaled = scaler.transform(input_data)
 
             # 클러스터 예측
-            cluster_label = kmeans_model.predict(input_data_scaled)[0]  # 첫 번째 요소만 추출
+            cluster_label = kmeans_model.predict(input_data_scaled)[0]
+
+            # 클러스터와 일치하는 이미지 링크 추출
+            cluster_images = []
+            for item in learning_data:
+                if item['cluster'] == cluster_label:
+                    cluster_images.append(item['이미지'])
 
             response = {
-                'cluster': int(cluster_label)
+                'cluster_images': cluster_images
             }
 
             return jsonify(response), 200
