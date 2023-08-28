@@ -15,7 +15,7 @@ scaler = StandardScaler()
 def home():
     return "hi"
 
-@app.route('/casu', methods=['POST'])
+@app.route('/casu', methods=['GET', 'POST'])
 def cluster_data():
     try:
         if request.method == 'POST' and request.is_json:
