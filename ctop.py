@@ -11,27 +11,39 @@ CORS(app)  # CORS 설정을 추가하여 CORS 관련 문제를 해결합니다.
 # 클러스터링 모델 로드
 kmeans_model = joblib.load('ctop_kmeans_model.pkl')
 
-# 스케일러 로드
+# 스케일러와 학습 데이터 로드
 scaler = None
+learning_data = None
 
-@app.route('/', methods=['GET', 'POST'])
+def load_scaler_and_data():
+    global scaler, learning_data
+
+    # 스케일러 초기화 및 학습 데이터 로드
+    if scaler is None:
+        with open('ctop_learning.json', 'r') as json_file:
+            learning_data = json.load(json_file)
+
+        # 평균기온과 일교차 데이터 추출
+        temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
+
+        # 스케일러 초기화 및 학습
+        scaler = StandardScaler()
+        scaler.fit(temperature_data)
+
+@app.route('/', methods=['POST'])
 def cluster_data():
-    global scaler
+    global scaler, learning_data
 
     try:
         if request.method == 'POST' and request.is_json:
             data = request.json  # 클라이언트에서 전송한 JSON 데이터
-            
-            if scaler is None:
-                raise ValueError("Scaler has not been fitted yet. Please fit the scaler first.")
-                
-            # JSON 파일에서 학습 데이터 추출
-            with open('ctop_learning.json', 'r') as json_file:
-                learning_data = json.load(json_file)
-                
+
+            # 스케일러 및 학습 데이터 로드
+            load_scaler_and_data()
+
             # 평균기온과 일교차 데이터 추출
             temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
-            
+
             # 입력 데이터 표준화
             new_data_scaled = scaler.transform(temperature_data)
 
@@ -49,15 +61,4 @@ def cluster_data():
         return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    # 스케일러를 여기에서 학습시켜야 합니다.
-    with open('ctop_learning.json', 'r') as json_file:
-        learning_data = json.load(json_file)
-        
-    # 평균기온과 일교차 데이터 추출
-    temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
-    
-    # 스케일러 학습
-    scaler = StandardScaler()
-    scaler.fit(temperature_data)
-    
     app.run(debug=True)
