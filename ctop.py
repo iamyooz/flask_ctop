@@ -41,17 +41,17 @@ def cluster_data():
             # 스케일러 및 학습 데이터 로드
             load_scaler_and_data()
 
-            # 평균기온과 일교차 데이터 추출
-            temperature_data = [[item['평균기온(°C)'], item['일교차(°C)']] for item in learning_data]
+            # 입력 데이터 추출
+            input_data = [[data['평균기온(°C)'], data['일교차(°C)']]]
 
             # 입력 데이터 표준화
-            new_data_scaled = scaler.transform(temperature_data)
+            input_data_scaled = scaler.transform(input_data)
 
             # 클러스터 예측
-            cluster_labels = kmeans_model.predict(new_data_scaled)
+            cluster_label = kmeans_model.predict(input_data_scaled)[0]  # 첫 번째 요소만 추출
 
             response = {
-                'clusters': [int(label) for label in cluster_labels]
+                'cluster': int(cluster_label)
             }
 
             return jsonify(response), 200
