@@ -15,7 +15,7 @@ learning_data = None
 def load_scaler_and_data():
     global scaler, learning_data
     if scaler is None:
-        with open('casual_top_cluster.csv', 'r') as json_file:
+        with open('casual_top_cluster.json', 'r') as json_file:
             learning_data = json.load(json_file)
 
         temperature_data = [[item['average_temperature'], item['temperature_difference']] for item in learning_data]
