@@ -1,6 +1,6 @@
 import json
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, creoss_origin 
 import joblib
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -24,6 +24,7 @@ def load_scaler_and_data():
         scaler.fit(temperature_data)
 
 @app.route('/', methods=['POST'])
+@cross_origin()
 def get_cluster_images():
     global scaler, learning_data
 
