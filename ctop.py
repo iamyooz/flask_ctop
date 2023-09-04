@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["localhost:3000", "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app/"])
+CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app"])
 
 kmeans_model = joblib.load('ctop_kmeans_model.pkl')
 scaler = None
