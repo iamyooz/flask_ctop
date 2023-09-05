@@ -24,7 +24,7 @@ def load_scaler_and_data():
         scaler.fit(temperature_data)
 
 @app.route('/ctop', methods=['POST'])
-@cross_origin()
+@cross_origin(origins=["http://localhost:3000", "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app"], supports_credentials=True)
 def get_cluster_images():
     global scaler, learning_data
 
